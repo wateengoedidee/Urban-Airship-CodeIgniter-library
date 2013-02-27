@@ -18,6 +18,11 @@ class Urban_airship {
 	$url = 'api/device_tokens/' . $token . '/';
 	return $this->_send(1, $url, $payload);	
 	}
+	
+	public function deRegister($token, $payload = null){
+	$url = 'api/device_tokens/' . $token . '/';
+	return $this->_send(3, $url, $payload);	
+	}
 
     public function push($tokens, $aps)
     {
@@ -27,6 +32,25 @@ class Urban_airship {
 	$payload = array("device_tokens" => $tokens, "aps" => $aps); 
 	return $this->_send(0, $url, $payload);
     }
+    
+     public function getAllDeviceTokens()
+    {
+	    $url = "api/device_tokens/";
+	    $session = curl_init('https://go.urbanairship.com/' . $url);	
+	    curl_setopt($session, CURLOPT_USERPWD, $this ->key . ':' . $this ->mastersecret);
+	    curl_setopt($session, CURLOPT_RETURNTRANSFER, True); 
+	   	$result = curl_exec ($session); 
+	   	$response = curl_getinfo($session);
+	   	curl_close($session);
+		
+		if($result){
+			if($response['http_code'] == '200'){  
+		   	  	return($result); //JSON Result
+		   	}
+	    	}
+	      
+    }
+
 
 	private function _send($method, $url, $payload = null){
 	$session = curl_init('https://go.urbanairship.com/' . $url);
@@ -45,6 +69,11 @@ class Urban_airship {
 		curl_setopt($session, CURLOPT_USERPWD, $this -> key . ':' . $this -> secret); 
 		curl_setopt($session, CURLOPT_CUSTOMREQUEST, 'PUT');
 			break;
+			
+		case 3:
+		curl_setopt($session, CURLOPT_USERPWD, $this -> key . ':' . $this -> secret); 
+		curl_setopt($session, CURLOPT_CUSTOMREQUEST, 'DELETE');
+			break;	
 	}
 	curl_setopt($session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); 
 	curl_setopt($session, CURLOPT_HEADER, False); 
